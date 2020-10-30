@@ -1,6 +1,4 @@
-extends RigidBody
-
-var speed = 10
+extends Spatial
 
 export(NodePath) var PlayerPath  = "" #You must specify this in the inspector!
 export(float) var MovementSpeed = 10
@@ -26,9 +24,13 @@ var JumpAcceleration = 3
 var IsAirborne = false
 
 func _ready():
-	$Camera.set_as_toplevel(true)
-	
+	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	Player = get_node(PlayerPath)
+	InnerGimbal =  $InnerGimbal
+	pass
+
 func _unhandled_input(event):
+	
 	if event is InputEventMouseMotion :
 		Rotation = event.relative
 	
@@ -43,21 +45,21 @@ func _unhandled_input(event):
 		match event.scancode:
 			KEY_ESCAPE:
 				get_tree().quit()
-			KEY_Z: #FORWARD
+			KEY_W: #FORWARD
 				Direction.z -= 1
 			KEY_S: #BACKBAWRD
 				Direction.z += 1
-			KEY_Q: #LEFT
+			KEY_A: #LEFT
 				Direction.x -= 1
 			KEY_D: #RIGHT
 				Direction.x += 1
 	if event is InputEventKey and not event.pressed:
 		match event.scancode:
-			KEY_Z:
+			KEY_W:
 				Direction.z += 1
 			KEY_S:
 				Direction.z -= 1
-			KEY_Q:
+			KEY_A:
 				Direction.x += 1
 			KEY_D:
 				Direction.x -= 1
@@ -67,18 +69,26 @@ func _unhandled_input(event):
 					IsAirborne = true
 	Direction.z = clamp(Direction.z, -1,1)
 	Direction.x = clamp(Direction.x, -1,1)
+	
 
-func _process(delta):
+func _physics_process(delta):
+	#Rotation
+	Player.rotate_y(deg2rad(-Rotation.x)*delta*MouseSensitivity)
+	InnerGimbal.rotate_x(deg2rad(-Rotation.y)*delta*MouseSensitivity)
+	InnerGimbal.rotation_degrees.x = clamp(InnerGimbal.rotation_degrees.x, -RotationLimit, RotationLimit)
+	Rotation = Vector2()
 	
-	if Input.is_action_pressed("w"):
-		add_torque(Direction * speed)
+	#Movement
+	var MaxSpeed = MovementSpeed *Direction.normalized()
+	Speed = Speed.linear_interpolate(MaxSpeed, delta * Acceleration)
+	Movement = Player.transform.basis * (Speed)
+	CurrentVerticalSpeed.y += gravity * delta * JumpAcceleration
+	Movement += CurrentVerticalSpeed
+	Player.move_and_slide(Movement,Vector3(0,1,0))
+	if Player.is_on_floor() :
+		CurrentVerticalSpeed.y = 0
+		IsAirborne = false
 	
-	if Input.is_action_pressed("s"):
-		add_torque(Direction * speed)
-	
-	if Input.is_action_pressed("a"):
-		add_torque(Direction * speed)
-	
-	if Input.is_action_pressed("d"):
-		add_torque(Direction * speed)
-	
+	#Zoom
+	ActualZoom = lerp(ActualZoom, ZoomFactor, delta * ZoomSpeed)
+	InnerGimbal.set_scale(Vector3(ActualZoom,ActualZoom,ActualZoom))

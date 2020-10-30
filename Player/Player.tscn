@@ -1,0 +1,28 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://Test/Egg.gd" type="Script" id=1]
+[ext_resource path="res://Test/Camera.gd" type="Script" id=2]
+[ext_resource path="res://Player/EggMesh.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Player/EggShape.tscn" type="PackedScene" id=4]
+
+[node name="Egg" type="RigidBody"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 2, 0 )
+contacts_reported = 10
+contact_monitor = true
+can_sleep = false
+linear_damp = 1.0
+angular_damp = 1.0
+script = ExtResource( 1 )
+
+[node name="Camera" type="Camera" parent="."]
+transform = Transform( 1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 0, 0 )
+current = true
+script = ExtResource( 2 )
+
+[node name="InnerGimbal" type="Spatial" parent="."]
+
+[node name="EggShape" parent="." instance=ExtResource( 4 )]
+
+[node name="EggMesh" parent="." instance=ExtResource( 3 )]
+
+[editable path="EggMesh"]
