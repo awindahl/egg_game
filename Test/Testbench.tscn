@@ -22,12 +22,33 @@ __meta__ = {
 }
 
 [node name="Floor" type="MeshInstance" parent="Environment"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.225459, -0.00105095, -0.0216866 )
 mesh = SubResource( 1 )
 material/0 = null
 
 [node name="StaticBody" type="StaticBody" parent="Environment/Floor"]
 
 [node name="CollisionShape" type="CollisionShape" parent="Environment/Floor/StaticBody"]
+shape = SubResource( 2 )
+
+[node name="Floor2" type="MeshInstance" parent="Environment"]
+transform = Transform( 0.207738, 0, -0.696201, 0, 1, 0, 0.201474, 0, 0.717847, 12.7213, 5.53199, -17.3941 )
+mesh = SubResource( 1 )
+material/0 = null
+
+[node name="StaticBody" type="StaticBody" parent="Environment/Floor2"]
+
+[node name="CollisionShape" type="CollisionShape" parent="Environment/Floor2/StaticBody"]
+shape = SubResource( 2 )
+
+[node name="Floor3" type="MeshInstance" parent="Environment"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 26.5336, 15.3847, -36.0647 )
+mesh = SubResource( 1 )
+material/0 = null
+
+[node name="StaticBody" type="StaticBody" parent="Environment/Floor3"]
+
+[node name="CollisionShape" type="CollisionShape" parent="Environment/Floor3/StaticBody"]
 shape = SubResource( 2 )
 
 [node name="Wall" type="MeshInstance" parent="Environment"]
