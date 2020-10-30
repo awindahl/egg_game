@@ -1,4 +1,4 @@
-extends RigidBody
+extends Spatial
 
 var speed = 10
 
@@ -26,8 +26,11 @@ var JumpAcceleration = 3
 var IsAirborne = false
 
 func _ready():
-	$Camera.set_as_toplevel(true)
-	
+	Player = get_node(PlayerPath)
+	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	InnerGimbal = $InnerGimbal
+	pass
+
 func _unhandled_input(event):
 	if event is InputEventMouseMotion :
 		Rotation = event.relative
@@ -43,21 +46,21 @@ func _unhandled_input(event):
 		match event.scancode:
 			KEY_ESCAPE:
 				get_tree().quit()
-			KEY_Z: #FORWARD
+			KEY_W: #FORWARD
 				Direction.z -= 1
 			KEY_S: #BACKBAWRD
 				Direction.z += 1
-			KEY_Q: #LEFT
+			KEY_A: #LEFT
 				Direction.x -= 1
 			KEY_D: #RIGHT
 				Direction.x += 1
 	if event is InputEventKey and not event.pressed:
 		match event.scancode:
-			KEY_Z:
+			KEY_W:
 				Direction.z += 1
 			KEY_S:
 				Direction.z -= 1
-			KEY_Q:
+			KEY_A:
 				Direction.x += 1
 			KEY_D:
 				Direction.x -= 1
@@ -65,20 +68,27 @@ func _unhandled_input(event):
 				if not IsAirborne:
 					CurrentVerticalSpeed = Vector3(0,MaxJump,0)
 					IsAirborne = true
+					
 	Direction.z = clamp(Direction.z, -1,1)
 	Direction.x = clamp(Direction.x, -1,1)
 
 func _process(delta):
 	
-	if Input.is_action_pressed("w"):
-		add_torque(Direction * speed)
+	Player.rotate_y(deg2rad(-Rotation.x)*delta*MouseSensitivity)
+	InnerGimbal.rotate_z(deg2rad(-Rotation.y)*delta*MouseSensitivity)
+	InnerGimbal.rotation_degrees.x = clamp(InnerGimbal.rotation_degrees.x, -RotationLimit, RotationLimit)
+	Rotation = Vector2()
 	
-	if Input.is_action_pressed("s"):
-		add_torque(Direction * speed)
+	#Movement
+	var MaxSpeed = MovementSpeed * Direction.normalized()
+	Speed = Speed.linear_interpolate(MaxSpeed, delta * Acceleration)
+	Movement = Player.transform.basis * (Speed)
+	CurrentVerticalSpeed.y += gravity * delta * JumpAcceleration
+	Movement += CurrentVerticalSpeed
 	
-	if Input.is_action_pressed("a"):
-		add_torque(Direction * speed)
+	Player.add_torque(Direction.normalized() * speed)
 	
-	if Input.is_action_pressed("d"):
-		add_torque(Direction * speed)
+	#Zoom
+	ActualZoom = lerp(ActualZoom, ZoomFactor, delta * ZoomSpeed)
+	InnerGimbal.set_scale(Vector3(ActualZoom,ActualZoom,ActualZoom))
 	

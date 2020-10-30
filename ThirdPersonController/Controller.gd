@@ -27,6 +27,7 @@ func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	Player = get_node(PlayerPath)
 	InnerGimbal =  $InnerGimbal
+	#InnerGimbal.get_node("Camera").set_as_toplevel(true)
 	pass
 
 func _unhandled_input(event):
@@ -70,7 +71,6 @@ func _unhandled_input(event):
 	Direction.z = clamp(Direction.z, -1,1)
 	Direction.x = clamp(Direction.x, -1,1)
 	
-
 func _physics_process(delta):
 	#Rotation
 	Player.rotate_y(deg2rad(-Rotation.x)*delta*MouseSensitivity)

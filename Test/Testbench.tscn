@@ -211,3 +211,4 @@ material/0 = null
 shape = SubResource( 4 )
 
 [node name="Player" parent="." instance=ExtResource( 1 )]
+continuous_cd = true
